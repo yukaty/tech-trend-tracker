@@ -33,6 +33,9 @@ pgvector==0.3.6
 platformdirs==4.3.6
 pluggy==1.5.0
 pre_commit==4.0.1
+psycopg==3.2.3
+psycopg-binary==3.2.3
+psycopg-c==3.2.3
 psycopg2-binary==2.9.10
 pydantic==2.10.3
 pydantic_core==2.27.1
