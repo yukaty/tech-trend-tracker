@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+
+venv/
+.env
+
+htmlcov/
+.coverage
+
+# JS
+node_modules/
+
+# DB
+data/
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
