@@ -1,9 +1,8 @@
+import os, logging, httpx, json
 from typing import List
-from datetime import datetime
-import json
-import logging
-import httpx
 from app.core.models import Article
+
+logger = logging.getLogger(__name__)
 
 class BrightDataClient:
     """Client for interacting with Bright Data's Web Scraper API"""
@@ -20,49 +19,41 @@ class BrightDataClient:
     async def collect_by_keywords(
         self,
         keywords: List[str],
-        sort: str = "newest",          # newest or relevance
-        start_date: datetime = None,
-        end_date: datetime = None,
-        limit: int = 1,
+        start_date: str = None,
+        end_date: str = None,
+        limit: int = None,
     ) -> str:
-        """
-        Trigger article collection by keywords and return snapshot ID
-
-        Args:
-            keywords: List of keywords to search
-            limit: Number of articles per keyword
-
-        Returns:
-            str: Snapshot ID for the collection
-        """
+        """Trigger article collection by keywords and return snapshot ID"""
+        # Prepare request body
         keyword_params = [
             {
                 "keyword": keyword,
-                "sort": sort,
-                "start_date": start_date.isoformat() if start_date else None,
-                "end_date": end_date.isoformat() if end_date else None,
+                "start_date": start_date,
+                "end_date": end_date,
             }
             for keyword in keywords
         ]
+
+        # Prepare request params
+        params = {
+            "dataset_id": self.dataset_id,
+            "include_errors": "true",
+            "type": "discover_new",
+            "discover_by": "keyword",
+        }
+        if limit:
+            params["limit_per_input"] = limit
 
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 f"{self.base_url}/trigger",
                 headers=self.headers,
-                params={
-                    "dataset_id": self.dataset_id,
-                    "include_errors": "true",
-                    "type": "discover_new",
-                    "discover_by": "keyword",
-                    "limit_per_input": limit,
-                },
+                params=params,
                 json=keyword_params,
             )
-            print(f"Trigger Response: {response.text}")
             response.raise_for_status()
             data = response.json()
             return data["snapshot_id"]
-
 
     async def get_collection_status(self, snapshot_id: str) -> str:
         """
@@ -92,9 +83,19 @@ class BrightDataClient:
             if line.strip():
                 try:
                     article_data = json.loads(line)
+
+                    if article_data.get("error_code") == "crawl_failed":
+                        logger.warning(f"Skipping failed article: {article_data}")
+                        continue
+
                     articles.append(Article(**article_data))
+
                 except json.JSONDecodeError as e:
-                    logging.warning(f"Failed to parse article data: {e}")
+                    logger.warning(f"Failed to parse article data: {e}")
+                    continue
+
+                except ValidationError as e:
+                    logger.warning(f"Invalid article data: {e}")
                     continue
 
         return articles
