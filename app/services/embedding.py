@@ -1,13 +1,22 @@
 import os
-from openai import OpenAI
+from openai import OpenAI, AsyncOpenAI
 from typing import List
 import psycopg
 
 client = OpenAI()
 
 def get_embedding(text: str) -> List[float]:
-    """Generate embedding using OpenAI API."""
+    """Generate embedding using OpenAI API (sync)."""
     response = client.embeddings.create(
+        model="text-embedding-3-small",
+        input=text,
+    )
+    return response.data[0].embedding
+
+async def get_embedding_async(text: str) -> List[float]:
+    """Generate embedding using OpenAI API (async)."""
+    client = AsyncOpenAI()
+    response = await client.embeddings.create(
         model="text-embedding-3-small",
         input=text,
     )
@@ -21,7 +30,7 @@ def generate_embeddings() -> None:
         # Get articles without embeddings
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT id, headline, description
+                SELECT id, headline, description, content
                 FROM articles
                 WHERE embedding IS NULL
                 LIMIT 100
@@ -29,8 +38,13 @@ def generate_embeddings() -> None:
             articles = cur.fetchall()
 
         # Generate and update embeddings
-        for article_id, headline, description in articles:
-            combined_text = f"{headline}\n\n{description}"
+        for article_id, headline, description, content in articles:
+            # combined_text = f"{headline}\n\n{description}"
+            combined_text = f"""
+            Title: {headline}
+            Description: {description}
+            Content Summary: {content[:500]}
+            """
             embedding = get_embedding(combined_text)
 
             # Update database

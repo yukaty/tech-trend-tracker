@@ -25,3 +25,13 @@ class DatabaseClient:
         """Close database connection pool"""
         if self.pool:
             await self.pool.close()
+
+    async def fetch(self, query: str, *args):
+        """Execute a query and return all results"""
+        async with self.pool.acquire() as conn:
+            return await conn.fetch(query, *args)
+
+    async def fetch_val(self, query: str, *args):
+        """Execute a query and return a single value"""
+        async with self.pool.acquire() as conn:
+            return await conn.fetchval(query, *args)

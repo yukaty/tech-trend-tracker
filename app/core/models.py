@@ -1,3 +1,4 @@
+# app/core/models.py
 from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
@@ -24,3 +25,27 @@ class Article(BaseModel):
     keyword: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+class SimilarArticle(BaseModel):
+    """Article model for similarity search results"""
+    id: str
+    url: str
+    headline: str
+    description: Optional[str] = None
+    publication_date: datetime
+    source: str = "Reuters"
+    topics: List[str]
+    similarity_score: float
+
+    model_config = ConfigDict(from_attributes=True)
+
+    @property
+    def formatted_date(self) -> str:
+        """Return formatted date for frontend display"""
+        return self.publication_date.strftime("%b %d, %Y")
+
+class SimilarArticlesResponse(BaseModel):
+    """Response model for similar articles search"""
+    articles: List[SimilarArticle]
+    total: int
+    hasMore: bool
