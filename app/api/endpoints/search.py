@@ -1,7 +1,7 @@
 import logging
 from fastapi import APIRouter, Query, HTTPException
 from typing import Optional
-from app.services.analysis.similar import find_similar_articles
+from app.services.similar import find_similar_articles
 from app.core.models import SimilarArticlesResponse
 
 logger = logging.getLogger(__name__)

@@ -1,4 +1,3 @@
-# app/core/models.py
 from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
@@ -49,3 +48,9 @@ class SimilarArticlesResponse(BaseModel):
     articles: List[SimilarArticle]
     total: int
     hasMore: bool
+
+class TrendingEntity(BaseModel):
+    """Response model for trending entities"""
+    name: str
+    count: int
+    trend: float  # Trend percentage

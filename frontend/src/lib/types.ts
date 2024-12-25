@@ -1,7 +1,21 @@
-type Period = '7d' | '30d' | '2024';
-type TimelineData = {
-  keywords: { text: string; count: number; trend: number }[];
-  companies: { name: string; count: number; trend: number }[];
-  people: { name: string; count: number; trend: number }[];
-  services: { name: string; count: number; trend: number }[];
-};
+export interface Article {
+    id: string
+    url: string
+    headline: string
+    description: string
+    publication_date: string
+    source: string
+    topics: string[]
+    similarity_score: number
+  }
+
+  export interface SearchResponse {
+    articles: Article[];
+    total: number;
+  }
+
+  export interface TrendingEntity {
+    name: string;
+    count: number;
+    trend: number;
+  }

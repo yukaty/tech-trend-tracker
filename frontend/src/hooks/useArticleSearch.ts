@@ -1,7 +1,6 @@
-// src/hooks/useArticleSearch.ts
 import { useState } from 'react';
-import { Article } from '@/types/article';
-import { searchSimilarArticles } from '@/services/articles';
+import { Article } from '@/lib/types';
+import { searchSimilarArticles } from '@/services/api'
 
 export function useArticleSearch() {
   const [articles, setArticles] = useState<Article[]>([]);

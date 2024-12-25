@@ -1,27 +1,30 @@
 "use client";
-
-import { TrendingUp } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { getTrendingKeywords } from "@/services/api";
+import type { TrendingEntity } from "@/lib/types";
+import RankingList from "./RankingList";
 
-export default function TopKeywords({
-  selectedPeriod,
-}: {
-  selectedPeriod: string;
-}) {
-  const keywords = [
-    { text: "Artificial Intelligence", trend: 85 },
-    { text: "Machine Learning", trend: 62 },
-    { text: "Cloud Computing", trend: 56 },
-    { text: "Cybersecurity", trend: 44 },
-    { text: "Blockchain", trend: 38 },
-  ];
+interface TopKeywordsProps {
+  selectedYear: number;
+  selectedMonth?: number;
+}
 
-  // const [keywords, setKeywords] = useState([]);
-  // useEffect(() => {
-  //   fetch(`/api/top-keywords?period=${selectedPeriod}`)
-  //     .then((res) => res.json())
-  //     .then((data) => setKeywords(data));
-  // }, [selectedPeriod]);
+export default function TopKeywords({ selectedYear, selectedMonth }: TopKeywordsProps) {
+  const [keywords, setKeywords] = useState<TrendingEntity[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getTrendingKeywords(selectedYear, selectedMonth);
+        setKeywords(data);
+      } catch (error) {
+        console.error('Failed to fetch keywords:', error);
+      }
+    };
+
+    fetchData();
+  }, [selectedYear, selectedMonth]);
 
   return (
     <Card>
@@ -29,25 +32,7 @@ export default function TopKeywords({
         <CardTitle>Top Keywords</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
-          {keywords.map((keyword, index) => (
-            <div
-              key={keyword.text}
-              className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-lg font-semibold text-blue-600">
-                  #{index + 1}
-                </span>
-                <span className="font-medium">{keyword.text}</span>
-              </div>
-              <div className="flex items-center text-emerald-600">
-                <span>+{keyword.trend}%</span>
-                <TrendingUp className="h-4 w-4 ml-2" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <RankingList items={keywords} />
       </CardContent>
     </Card>
   );

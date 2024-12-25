@@ -1,4 +1,4 @@
-import { Article } from "@/types/article";
+import { Article } from "@/lib/types";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
 
