@@ -1,5 +1,5 @@
 "use client";
-import { memo } from "react";
+
 import {
   Select,
   SelectContent,
@@ -23,31 +23,28 @@ const MONTHS = [
   { value: 12, label: "Dec" },
 ];
 
-// Button Component
-const PeriodButton = memo(
-  ({
-    isSelected,
-    onClick,
-    children,
-  }: {
-    isSelected: boolean;
-    onClick: () => void;
-    children: React.ReactNode;
-  }) => (
-    <button
-      onClick={onClick}
-      className={`
+const PeriodButton = ({
+  isSelected,
+  onClick,
+  children,
+}: {
+  isSelected: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) => (
+  <button
+    onClick={onClick}
+    className={`
      px-4 py-2 rounded-md transition-all
      ${
        isSelected
          ? "bg-blue-600 text-white shadow-md"
-         : "bg-gray-100 hover:bg-gray-200"
+         : "bg-gray-100 text-gray-500 hover:bg-gray-200"
      }
    `}
-    >
-      {children}
-    </button>
-  )
+  >
+    {children}
+  </button>
 );
 
 export default function PeriodSelector({
@@ -61,7 +58,6 @@ export default function PeriodSelector({
   onYearChange: (year: number) => void;
   onMonthChange: (month: number | undefined) => void;
 }) {
-  // Desktop View
   const DesktopView = (
     <div className="hidden sm:flex flex-wrap gap-2">
       <PeriodButton
@@ -89,7 +85,6 @@ export default function PeriodSelector({
     </div>
   );
 
-  // Mobile View
   const MobileView = (
     <div className="sm:hidden space-y-3 w-full px-4">
       <Select

@@ -1,21 +1,21 @@
-"use client"
+"use client";
+import { Suspense } from "react";
+import { TrendingUp, Search } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import Link from "next/link";
 
-import { TrendingUp, Search } from "lucide-react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { useState } from "react"
-import Link from "next/link"
-
-export default function Navbar() {
-  const router = useRouter()
+function NavbarContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const [query, setQuery] = useState(searchParams.get('q') || "");
+  const [query, setQuery] = useState(searchParams.get("q") || "");
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query)}`)
+      router.push(`/search/similar?q=${encodeURIComponent(query)}`);
     }
-  }
+  };
 
   return (
     <nav className="bg-white shadow-sm border-b fixed top-0 left-0 w-full">
@@ -23,7 +23,9 @@ export default function Navbar() {
         <Link href="/">
           <div className="flex items-center">
             <TrendingUp className="h-8 w-8 text-blue-600" />
-            <span className="text-xl font-semibold ps-2">Tech Trend Tracker</span>
+            <span className="text-xl font-semibold ps-2">
+              Tech Trend Tracker
+            </span>
           </div>
         </Link>
         <form onSubmit={handleSearch} className="w-96">
@@ -40,5 +42,13 @@ export default function Navbar() {
         </form>
       </div>
     </nav>
-  )
+  );
+}
+
+export default function Navbar() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NavbarContent />
+    </Suspense>
+  );
 }

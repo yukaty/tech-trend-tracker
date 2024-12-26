@@ -12,6 +12,7 @@ export interface Article {
   export interface SearchResponse {
     articles: Article[];
     total: number;
+    hasMore: boolean;
   }
 
   export interface TrendingEntity {
