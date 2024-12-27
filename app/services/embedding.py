@@ -33,7 +33,6 @@ def generate_embeddings() -> None:
                 SELECT id, headline, description, content
                 FROM articles
                 WHERE embedding IS NULL
-                LIMIT 100
             """)
             articles = cur.fetchall()
 

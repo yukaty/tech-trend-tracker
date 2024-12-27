@@ -21,9 +21,8 @@ class TrendService:
                     entities e
                     JOIN article_entities ae ON e.name = ae.entity_name
                 WHERE
-                    ($1 = 'dummy' OR e.type = $1)
-                    AND {condition}
-                    AND date_part('month', ae.publication_date) IN (1, 12)
+                    {condition} AND
+                    date_part('month', ae.publication_date) IN (1, 12)  -- January and December
                 GROUP BY
                     e.name, date_part('month', ae.publication_date)
             ),
@@ -66,7 +65,7 @@ class TrendService:
                     entities e
                     JOIN article_entities ae ON e.name = ae.entity_name
                 WHERE
-                    ($1 = 'dummy' OR e.type = $1) AND {condition}
+                    {condition}
                 GROUP BY
                     e.name
             ),
@@ -78,7 +77,7 @@ class TrendService:
                     entities e
                     JOIN article_entities ae ON e.name = ae.entity_name
                 WHERE
-                    ($1 = 'dummy' OR e.type = $1)
+                    e.type = $1
                     AND date_part('year', ae.publication_date) = $4
                     AND date_part('month', ae.publication_date) = $5
                 GROUP BY
@@ -111,7 +110,7 @@ class TrendService:
         return [TrendingEntity(**dict(record)) for record in records]
 
     async def get_trending_entities(self, category: str, year: int, month: Optional[int] = None) -> List[TrendingEntity]:
-        base_condition = f"date_part('year', ae.publication_date) = $2"
+        base_condition = f"e.type = $1 AND date_part('year', ae.publication_date) = $2"
 
         if month is None:
             query = self._build_trend_query(base_condition)
@@ -134,7 +133,7 @@ class TrendService:
 
         if month is None:
             query = self._build_trend_query(base_condition)
-            return await self._get_trends(query, 'dummy', year)
+            return await self._get_trends(query, "", year)
 
         # Calculate previous month
         if month == 1:
@@ -146,4 +145,5 @@ class TrendService:
 
         # Build query for monthly trends
         query = self._build_monthly_query(f"{base_condition} AND date_part('month', ae.publication_date) = $3")
-        return await self._get_trends(query, 'dummy', year, month, prev_year, prev_month)
+        return await self._get_trends(query, "", year, month, prev_year, prev_month)
+

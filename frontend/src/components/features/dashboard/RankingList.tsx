@@ -18,7 +18,9 @@ export default function RankingList({ items }: RankingListProps) {
   };
 
   const renderTrendIndicator = (trend: number) => {
-    if (trend === 0) return null;
+    if (trend === null || trend === 0) {
+      return <span className="text-gray-500">-</span>;
+    }
 
     return trend > 0 ? (
       <div className="flex items-center text-emerald-600">

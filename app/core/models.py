@@ -42,4 +42,4 @@ class SimilarArticlesResponse(BaseModel):
 class TrendingEntity(BaseModel):
     name: str
     count: int
-    trend: float
+    trend: float | None = None

@@ -37,4 +37,4 @@ CREATE TABLE IF NOT EXISTS article_entities (
 CREATE INDEX IF NOT EXISTS idx_articles_publication_date ON articles(publication_date);
 CREATE INDEX IF NOT EXISTS idx_articles_topics ON articles USING gin(topics);
 CREATE INDEX IF NOT EXISTS idx_article_entities_date ON article_entities(publication_date);
-CREATE INDEX IF NOT EXISTS idx_article_entities_entity_date ON article_entities(entity_id, publication_date);
+CREATE INDEX IF NOT EXISTS idx_article_entities_entity_date ON article_entities(entity_name, publication_date);
