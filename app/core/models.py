@@ -13,12 +13,9 @@ class Article(BaseModel):
     headline: str
     description: Optional[str] = None
     content: str = None
-    topics: List[str] = None
     publication_date: datetime
     updated_last: Optional[datetime] = None
     source: Optional[str] = "Reuters"
-    related_articles: Optional[List[RelatedArticle]] = None
-    keyword: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

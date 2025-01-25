@@ -13,6 +13,9 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install NLTK punkt tokenizer
+RUN python -m nltk.downloader punkt_tab
+
 # Copy project files
 COPY . .
 
