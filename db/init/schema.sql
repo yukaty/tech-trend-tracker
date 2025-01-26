@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS articles (
     content TEXT NOT NULL,
     publication_date TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_last TIMESTAMP WITH TIME ZONE,
-    source TEXT DEFAULT 'Reuters',
+    source TEXT DEFAULT 'Reuters'
 );
 
 -- Entities

@@ -1,11 +1,12 @@
-import { SearchResponse, TrendingEntity } from "@/lib/types";
+import { RAGResponse, SearchResponse, TrendingEntity } from "@/lib/types";
 
+// const API_SERVER = "http://localhost:8000/api"
 const API_SERVER = process.env.NEXT_PUBLIC_API_URL
 if (!API_SERVER) {
   throw new Error('NEXT_PUBLIC_API_URL environment variable is not set');
 }
 
-export async function searchSimilarArticles(query: string, page = 1, limit = 10): Promise<SearchResponse> {
+export async function searchSimilarArticles(query: string, page = 1, limit = 10): Promise<RAGResponse> {
   const res = await fetch(`${API_SERVER}/search/similar?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`)
   if (!res.ok) throw new Error('Failed to fetch articles')
   return res.json()

@@ -29,7 +29,6 @@ async def search_by_keyword(
             WHERE
                 content ILIKE $1
                 OR headline ILIKE $1
-                OR keyword ILIKE $1
             ORDER BY publication_date DESC
             LIMIT $2 OFFSET $3
         """
@@ -40,7 +39,6 @@ async def search_by_keyword(
             WHERE
                 content ILIKE $1
                 OR headline ILIKE $1
-                OR keyword ILIKE $1
         """
 
         search_pattern = f"%{keyword}%"
