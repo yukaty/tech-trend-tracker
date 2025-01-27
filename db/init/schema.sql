@@ -9,9 +9,7 @@ CREATE TABLE IF NOT EXISTS articles (
     url TEXT NOT NULL,
     headline TEXT NOT NULL,
     description TEXT,
-    content TEXT NOT NULL,
     publication_date TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_last TIMESTAMP WITH TIME ZONE,
     source TEXT DEFAULT 'Reuters'
 );
 

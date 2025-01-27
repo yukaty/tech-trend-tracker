@@ -7,9 +7,7 @@ class Article(BaseModel):
     url: str
     headline: str
     description: Optional[str] = None
-    content: Optional[str] = None
     publication_date: datetime
-    updated_last: Optional[datetime] = None
     source: Optional[str] = "Reuters"
 
     model_config = ConfigDict(from_attributes=True)

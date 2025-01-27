@@ -18,27 +18,27 @@ async def search_by_keyword(
         logger.info(f"Searching with keyword: {keyword}, limit: {limit}, offset: {offset}")
 
         sql = """
-            SELECT
-                id,
-                url,
-                headline,
-                description,
-                publication_date,
-                source
-            FROM articles
+            SELECT DISTINCT
+            a.id, a.url, a.headline, a.description,
+            a.publication_date, a.source
+            FROM articles a
+            JOIN article_chunks c ON a.id = c.article_id
             WHERE
-                content ILIKE $1
-                OR headline ILIKE $1
-            ORDER BY publication_date DESC
-            LIMIT $2 OFFSET $3
+            c.chunk_text ILIKE $1
+            OR a.description ILIKE $1
+            OR a.headline ILIKE $1
+            ORDER BY a.publication_date DESC
+            LIMIT $2 OFFSET $3;
         """
 
         total_sql = """
-            SELECT COUNT(*)
-            FROM articles
+            SELECT COUNT(DISTINCT a.id)
+            FROM articles a
+            JOIN article_chunks c ON a.id = c.article_id
             WHERE
-                content ILIKE $1
-                OR headline ILIKE $1
+            c.chunk_text ILIKE $1
+            OR a.description ILIKE $1
+            OR a.headline ILIKE $1;
         """
 
         search_pattern = f"%{keyword}%"

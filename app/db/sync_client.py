@@ -23,16 +23,13 @@ def save_articles(articles: List[Article]) -> None:
                     # Save article
                     cur.execute('''
                         INSERT INTO articles (
-                            id, url, headline, description, content,
-                            publication_date, updated_last, source
-                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                        ON CONFLICT (id) DO UPDATE SET
-                            updated_last = EXCLUDED.updated_last,
-                            content = EXCLUDED.content
+                            id, url, headline, description,
+                            publication_date, source
+                        ) VALUES (%s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (id) DO NOTHING
                     ''', (
                         article.id, article.url, article.headline,
-                        article.description, article.content,
-                        article.publication_date, article.updated_last,
+                        article.description, article.publication_date,
                         article.source
                     ))
 
