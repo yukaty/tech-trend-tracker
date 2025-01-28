@@ -6,7 +6,14 @@ export interface Article {
     publication_date: string
     source: string
     topics: string[]
-    similarity_score: number
+    relevance_score: number
+  }
+
+  export interface RAGResponse {
+    answer: string;
+    articles: Article[];
+    total: number;
+    hasMore: boolean;
   }
 
   export interface SearchResponse {

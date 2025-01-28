@@ -23,35 +23,31 @@ async def get_embedding_async(text: str) -> List[float]:
     return response.data[0].embedding
 
 def generate_embeddings() -> None:
-    """Generate embeddings for articles without them."""
-    conn_str = os.getenv("DATABASE_URL")
-
-    with psycopg.connect(conn_str) as conn:
-        # Get articles without embeddings
+    """Generate embeddings for article chunks."""
+    with psycopg.connect(os.getenv("DATABASE_URL")) as conn:
         with conn.cursor() as cur:
+            # Get chunks without embeddings
             cur.execute("""
-                SELECT id, headline, description, content
-                FROM articles
-                WHERE embedding IS NULL
+                SELECT c.id, c.chunk_text, c.metadata->>'headline' as headline
+                FROM article_chunks c
+                WHERE c.chunk_embedding IS NULL
             """)
-            articles = cur.fetchall()
+            chunks = cur.fetchall()
 
-        # Generate and update embeddings
-        for article_id, headline, description, content in articles:
-            # combined_text = f"{headline}\n\n{description}"
-            combined_text = f"""
-            Title: {headline}
-            Description: {description}
-            Content Summary: {content[:500]}
-            """
-            embedding = get_embedding(combined_text)
+        for chunk_id, chunk_text, headline in chunks:
+            try:
+                # Create combined text for embedding
+                combined_text = f"Title: {headline}\n\nContent: {chunk_text}"
+                embedding = get_embedding(combined_text)
 
-            # Update database
-            with conn.cursor() as cur:
-                cur.execute("""
-                    UPDATE articles
-                    SET embedding = %s
-                    WHERE id = %s
-                """, (embedding, article_id))
+                # Update database
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        UPDATE article_chunks
+                        SET chunk_embedding = %s
+                        WHERE id = %s
+                    """, (embedding, chunk_id))
+                conn.commit()
 
-            conn.commit()
+            except Exception as e:
+                print(f"Failed to generate embedding for chunk {chunk_id}: {e}")

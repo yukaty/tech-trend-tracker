@@ -2,28 +2,36 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-import { Article } from "@/lib/types";
+import { RAGResponse } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { searchSimilarArticles } from "@/services/api";
-import ArticleList from "@/components/features/search/ArticleList";
+import RAGResults from "@/components/features/search/RAGResults";
 
 function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
-  const [articles, setArticles] = useState<Article[]>([]);
+  const [data, setData] = useState<RAGResponse>({
+    answer: "",
+    articles: [],
+    total: 0,
+    hasMore: false
+  });
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
 
   const fetchArticles = useCallback(
     async (pageNum: number, reset = false) => {
       try {
         setLoading(true);
-        const data = await searchSimilarArticles(query, pageNum);
-        setArticles((prev) =>
-          reset ? data.articles : [...prev, ...data.articles]
-        );
-        setHasMore(data.hasMore);
+        const response = await searchSimilarArticles(query, pageNum);
+        if (reset) {
+          setData(response);
+        } else {
+          setData(prev => ({
+            ...response,
+            articles: [...prev.articles, ...response.articles],
+          }));
+        }
         setPage(pageNum);
       } finally {
         setLoading(false);
@@ -43,10 +51,10 @@ function SearchContent() {
   return (
     <div className="max-w-4xl mx-auto py-6 px-4">
       <h2 className="text-2xl font-semibold mb-6">
-        Articles similar to &quot;{query}&quot;
+        Insights for &quot;{query}&quot;
       </h2>
-      <ArticleList articles={articles} />
-      {hasMore && (
+      <RAGResults data={data} />
+      {data.hasMore && (
         <div className="mt-6 text-center">
           <Button onClick={handleLoadMore} disabled={loading} variant="outline">
             {loading ? "Loading..." : "Load More"}
