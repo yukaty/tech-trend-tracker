@@ -1,10 +1,12 @@
 import logging
 import re
 from typing import List
+
 from openai import AsyncOpenAI
 
 logger = logging.getLogger(__name__)
 client = AsyncOpenAI()
+
 
 async def generate_answer(query: str, relevant_chunks: List[str]) -> str:
     """
@@ -18,9 +20,8 @@ async def generate_answer(query: str, relevant_chunks: List[str]) -> str:
     try:
         # Prepare context from chunks
         cleaned_chunks = [
-            re.sub(r'\([^)]*\)', '',
-                re.sub(r'<[^>]+>', '', chunk)
-            ) for chunk in relevant_chunks
+            re.sub(r"\([^)]*\)", "", re.sub(r"<[^>]+>", "", chunk))
+            for chunk in relevant_chunks
         ]
         context = "\n\n".join(cleaned_chunks)
 
@@ -34,19 +35,35 @@ async def generate_answer(query: str, relevant_chunks: List[str]) -> str:
         Question: {query}"""
 
         response = await client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-5-nano",
             messages=[
-                {"role": "system",
-                 "content": """You are a clear and insightful technology analyst who:
+                {
+                    "role": "system",
+                    "content": """You are a clear and insightful technology analyst who:
                  - Structures answers in 2-3 key points
                  - Includes specific numbers to support insights
-                 - Uses concise, direct language"""},
-                {"role": "user", "content": prompt}
+                 - Uses concise, direct language""",
+                },
+                {"role": "user", "content": prompt},
             ],
-            temperature=0.3,
-            max_tokens=500
+            max_completion_tokens=2000,
         )
-        return response.choices[0].message.content
+
+        # Debug: log token usage for reasoning model
+        logger.info(
+            f"Token usage - Reasoning: {response.usage.completion_tokens_details.reasoning_tokens}, "
+            f"Total completion: {response.usage.completion_tokens}, "
+            f"Finish reason: {response.choices[0].finish_reason}"
+        )
+
+        content = response.choices[0].message.content
+        if not content:
+            logger.warning(
+                f"Empty response from gpt-5-nano. Reasoning tokens: {response.usage.completion_tokens_details.reasoning_tokens}"
+            )
+            return "Sorry, I couldn't generate an answer at this time."
+
+        return content
 
     except Exception as e:
         logger.error(f"Error generating answer: {e}")
